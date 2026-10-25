@@ -1,0 +1,403 @@
+FARS 2015 PERSON FILE - CODE REFERENCE
+======================================
+Meaning of the numeric codes in the 30-column extract used in this project
+(NHTSA Fatality Analysis Reporting System, person-level table for 2015,
+Google BigQuery dataset nhtsa_traffic_fatalities).
+
+
+SOURCES AND HOW TO READ THIS FILE
+---------------------------------
+- Codes come from the NHTSA FARS Analytical User's Manual (2015) and the
+  data dictionary of the BigQuery table. Where a table was checked against
+  the data, the labels are the ones that appear in the extract.
+- A plus sign (+) marks entries that follow NHTSA's standard coding but were
+  not separately cross-checked against the 2015 manual text. Confirm them
+  there before relying on them for anything beyond this project.
+- Codes are shown as they appear in the data. Leading zeros may be dropped
+  (07 can appear as 7).
+- Sections follow the column order of the extract. Columns with no codes
+  are skipped (consecutive_number, person_number, timestamp_of_crash).
+- vehicle_make has no table here because the list is very long. See the
+  Make element (V9, printed page 233) of the FARS Analytical User's Manual.
+- Text columns (school_bus_related, rollover, fire_occurrence, sex,
+  police_reported_alcohol_involvement, alcohol_test_status1,
+  police_reported_drug_involvement, drug_test_status) arrive as text labels
+  in the BigQuery export, not as codes. The labels listed are the ones
+  found in the data.
+
+General coding rules from the manual:
+- Unknown is always coded with 9s (9, 99, 999, ...).
+- Not Applicable is coded with zeros, with a few exceptions (for example 8
+  for ejection and 8888 for death time).
+- None is coded 0, except for the alcohol test result.
+- Rollover, Emergency Motor Vehicle Use and Fire Occurrence are coded 0
+  even when nothing is known, so a 0 there can mean "no" or "not reported".
+
+Codes such as 8, 9, 98, 99 and 996-999 usually mean Not Reported, Unknown or
+None Given. They should be set to missing before any statistics are run. The
+exact codes treated as missing in this project are listed in the last
+section.
+
+
+CODES, IN COLUMN ORDER
+======================
+
+1. state_number
+   1 Alabama           2 Alaska            4 Arizona          5 Arkansas
+   6 California        8 Colorado          9 Connecticut     10 Delaware
+  11 District of Columbia                 12 Florida         13 Georgia
+  15 Hawaii           16 Idaho            17 Illinois        18 Indiana
+  19 Iowa             20 Kansas           21 Kentucky        22 Louisiana
+  23 Maine            24 Maryland         25 Massachusetts   26 Michigan
+  27 Minnesota        28 Mississippi      29 Missouri        30 Montana
+  31 Nebraska         32 Nevada           33 New Hampshire   34 New Jersey
+  35 New Mexico       36 New York         37 North Carolina  38 North Dakota
+  39 Ohio             40 Oklahoma         41 Oregon          42 Pennsylvania
+  44 Rhode Island     45 South Carolina   46 South Dakota    47 Tennessee
+  48 Texas            49 Utah             50 Vermont         51 Virginia
+  53 Washington       54 West Virginia    55 Wisconsin       56 Wyoming
+  The manual also lists 43 Puerto Rico and 52 Virgin Islands. They may not
+  appear in the data.
+
+2. county
+   000      Not Applicable
+   001-996  GSA geographic codes. The same number is a different county in
+            each state, so always read it together with state_number.
+   997      Other
+   998      Not Reported
+   999      Unknown
+   The table holds no county names. Names need the GSA geographic code
+   (GLC) list.
+
+3. land_use
+   1 Rural
+   2 Urban
+   6 Trafficway Not in State Inventory
+   8 Not Reported
+   9 Unknown
+
+4. functional_system
+   01 Interstate
+   02 Principal Arterial - Other Freeways and Expressways
+   03 Principal Arterial - Other
+   04 Minor Arterial
+   05 Major Collector
+   06 Minor Collector
+   07 Local
+   96 Trafficway Not in State Inventory
+   98 Not Reported
+   99 Unknown
+
+5. number_of_motor_vehicles_in_transport_mvit
+   001-999  Count of vehicles in transport (a count, not a code)
+
+6. first_harmful_event
+   1  Rollover/Overturn
+   2  Fire/Explosion
+   3  Immersion or Partial Immersion
+   4  Gas Inhalation
+   5  Fell/Jumped from Vehicle
+   6  Injured in Vehicle (Non-Collision)
+   7  Other Non-Collision
+   8  Pedestrian
+   9  Pedalcyclist
+   10 Railway Vehicle
+   11 Live Animal
+   12 Motor Vehicle In-Transport
+   14 Parked Motor Vehicle
+   15 Non-Motorist on Personal Conveyance
+   16 Thrown or Falling Object
+   17 Boulder
+   18 Other Object (Not Fixed)
+   19 Building
+   20 Impact Attenuator/Crash Cushion
+   21 Bridge Pier or Support
+   23 Bridge Rail (Includes Parapet)
+   24 Guardrail Face
+   25 Concrete Traffic Barrier
+   26 Other Traffic Barrier
+   30 Utility Pole/Light Support
+   31 Other Post, Other Pole or Other Supports
+   32 Culvert
+   33 Curb
+   34 Ditch
+   35 Embankment
+   38 Fence
+   39 Wall
+   40 Fire Hydrant
+   41 Shrubbery
+   42 Tree (Standing Only)
+   43 Other Fixed Object
+   44 Pavement Surface Irregularity (Ruts, Potholes, Grates, etc.)
+   45 Working Motor Vehicle
+   46 Traffic Signal Support
+   48 Snow Bank
+   49 Ridden Animal or Animal Drawn Conveyance
+   50 Bridge Overhead Structure
+   51 Jackknife (harmful to this vehicle)
+   52 Guardrail End
+   53 Mail Box
+   54 Motor Vehicle In-Transport Strikes or is Struck by Cargo, Persons or
+      Objects Set-in-Motion from/by Another Motor Vehicle In-Transport
+   55 Motor Vehicle In Motion Outside the Trafficway
+   57 Cable Barrier
+   58 Ground
+   59 Traffic Sign Support
+   72 Cargo/Equipment Loss or Shift (harmful to this vehicle)
+   73 Object Fell From Motor Vehicle In-Transport
+   99 Unknown
+
+   The manual groups these codes as follows (the project uses the same
+   groups in the column first_event_group):
+   Non-collision:
+      1, 2, 3, 4, 5, 6, 7, 16, 44, 51, 72
+   Collision with motor vehicle in transport:
+      12, 54, 55
+   Collision with object not fixed:
+      8, 9, 10, 11, 14, 15, 18, 45, 49, 73
+   Collision with fixed object:
+      17, 19, 20, 21, 23, 24, 25, 26, 30, 31, 32, 33, 34, 35, 38, 39, 40,
+      41, 42, 43, 46, 48, 50, 52, 53, 57, 58, 59
+   Unknown:
+      99
+
+7. manner_of_collision +
+   0  Not Collision with Motor Vehicle in Transport
+   1  Front-to-Rear
+   2  Front-to-Front
+   6  Angle
+   7  Sideswipe - Same Direction
+   8  Sideswipe - Opposite Direction
+   9  Rear-to-Side
+   10 Rear-to-Rear
+   11 Other
+   98 Not Reported
+   99 Reported as Unknown
+   (Labels shortened. Codes 0, 1, 2 and 6 were seen in the sample rows.)
+
+8. school_bus_related
+   0 No
+   1 Yes
+   Not Reported has no code in the data dictionary. In the extract the
+   labels are No, Yes and Not Reported; Not Reported is set to missing.
+
+9. body_type
+   The full list is long. See the Body Type element of the FARS Analytical
+   User's Manual. This project groups the codes into vehicle classes by
+   range:
+      1-13   Car             (for example 4 = 4-Door Sedan/Hardtop)
+      14-19  SUV
+      20-29  Van
+      30-39  Pickup
+      50-59  Bus
+      60-79  Heavy truck
+      80-89  Motorcycle/moped
+      all other codes and missing: Other/unknown
+   Range boundaries follow the manual's body-type groupings (+). Codes 4, 5,
+   6, 9, 14, 21, 31 and 66 appear in the sample rows.
+
+10. rollover
+    Labels in the data:
+    No Rollover                            (code 0)
+    Rollover, Tripped by Object/Vehicle    (code 1)
+    Rollover, Untripped                    (code 2)
+    Rollover, Unknown Type                 (code 9)
+    Rollover is coded 0 even when nothing is known (see general rules).
+
+11. fire_occurrence
+    Labels in the data:
+    No or Not Reported                     (code 0)
+    Yes                                    (code 1)
+    The data dictionary also describes a fire that started in this vehicle
+    and spread to another vehicle. Among drivers with a known outcome, only
+    the two labels above appear.
+
+12. age
+    000      Less than One Year
+    001-120  Age in years
+    998      Not Reported
+    999      Unknown
+
+13. sex
+    Labels in the data:
+    Male                                   (code 1)
+    Female                                 (code 2)
+    Not Reported                           (code 8)
+    Unknown                                (code 9)
+
+14. person_type
+    Occupants of motor vehicles:
+    1  Driver of a Motor Vehicle In-Transport
+    2  Passenger of a Motor Vehicle In-Transport                +
+    3  Occupant of a Motor Vehicle Not In-Transport             +
+    9  Unknown Occupant Type                                    +
+    People not in a motor vehicle:
+    4  Occupant of a Non-Motor Vehicle Transport Device
+    5  Pedestrian
+    6  Bicyclist
+    7  Other Cyclist
+    8  Person on Personal Conveyances
+    10 Persons In/On Buildings
+    19 Unknown Type of Non-Motorist                             +
+
+15. injury_severity (KABCO scale)
+    0 No Apparent Injury (O)
+    1 Possible Injury (C)                                       +
+    2 Suspected Minor Injury (B)                                +
+    3 Suspected Serious Injury (A)                              +
+    4 Fatal Injury (K)
+    5 Injured, Severity Unknown                                 +
+    6 Died Prior to Crash                                       +
+    9 Unknown
+    A fatal injury requires death within 720 hours (30 days) of the crash.
+    This project uses code 4 as "killed" and keeps only codes 0-4.
+
+16. restraint_system_helmet_use
+    0  Not Applicable
+    1  Shoulder Belt Only Used
+    2  Lap Belt Only Used
+    3  Shoulder and Lap Belt Used
+    4  Child Restraint Type Unknown
+    5  DOT-Compliant Motorcycle Helmet
+    7  None Used
+    8  Restraint Used - Type Unknown
+    10 Child Restraint System - Forward Facing
+    11 Child Restraint System - Rear Facing
+    12 Booster Seat
+    16 Helmet, Other than DOT-Compliant Motorcycle Helmet
+    17 No Helmet
+    19 Helmet, Unknown if DOT-Compliant
+    29 Unknown if Helmet Worn
+    97 Other
+    98 Not Reported
+    99 Unknown
+    Grouping used in this project:
+      Restrained      1, 2, 3, 4, 5, 8, 10, 11, 12, 16, 19
+      Not restrained  7, 17
+      Unknown         0, 29, 97, 98, 99 and missing
+
+17. air_bag_deployed
+    0  Not Applicable
+    1  Deployed-Front
+    2  Deployed-Side (door, seatback)
+    3  Deployed-Curtain (roof)
+    7  Deployed-Other (knee, air belt, etc.)
+    8  Deployed-Combination
+    9  Deployment-Unknown Location
+    20 Not Deployed
+    28 Switched Off
+    98 Not Reported
+    99 Deployment Unknown
+    Grouping used in this project:
+      Deployed        1, 2, 3, 7, 8, 9
+      Not deployed    20, 28
+      Missing         0, 98, 99
+
+18. ejection
+    0 Not Ejected
+    1 Totally Ejected
+    2 Partially Ejected
+    3 Ejected - Unknown Degree (since 2008)
+    7 Not Reported
+    8 Not Applicable
+    9 Unknown if Ejected (since 2009)
+    Do not use the raw codes as a scale, because 1 is more severe than 2. The
+    project orders ejection as Not Ejected < Partially Ejected < Ejected,
+    Unknown Degree < Totally Ejected, and scores the correlation analysis
+    0, 1, 1.5, 2.
+
+19. police_reported_alcohol_involvement
+    Labels in the data:
+    No (Alcohol Not Involved)              (code 0)
+    Yes (Alcohol Involved)                 (code 1)
+    Not Reported                           (code 8)
+    Unknown (Police Reported)              (code 9)
+
+20. alcohol_test_status1
+    Labels in the data:
+    Test Not Given                         (code 0)
+    Test Refused                           (code 1)
+    Test Given                             (code 2)
+    Not Reported                           (code 8)
+    Unknown if Tested                      (code 9)
+
+21. alcohol_test_status3 (BAC result)
+    000-939  Actual BAC value in thousandths of g/dL (174 = 0.174)
+    940      0.94 or greater
+    995      Not Reported
+    996      None Given (Test Not Given)
+    997      Test performed, results unknown
+    998      Positive breath test with no actual value
+    999      Unknown if tested
+    Some sources give 930 rather than 939 as the highest actual value. In
+    the project this column becomes `bac` (value / 1000) and codes 995-999
+    become missing.
+
+22. police_reported_drug_involvement
+    Labels in the data:
+    No (Drugs Not Involved)                (code 0)
+    Yes (Drugs Involved)                   (code 1)
+    Not Reported                           (code 8)
+    Unknown (Police Reported)              (code 9)
+
+23. drug_test_status
+    Labels in the data:
+    Test Not Given                         (code 0)
+    Test Refused                           (code 1)
+    Test Given                             (code 2)
+    Not Reported                           (code 8)
+    Unknown if Tested                      (code 9)
+
+24-26. drug_test_type4, drug_test_type5, drug_test_type6
+    Three slots for the drug results found in one person's test. The same
+    codes apply to all three. A specific drug code (such as 239 or 600)
+    falls inside its category range.
+    000      Test Not Given (also fills an unused slot)
+    001      Tested, No Drugs Found/Negative
+    095      Not Reported
+    100-295  Narcotic
+    300-395  Depressant
+    400-495  Stimulant
+    500-595  Hallucinogen
+    600-695  Cannabinoid
+    700-795  Phencyclidine (PCP)
+    800-895  Anabolic Steroid
+    900-995  Inhalant
+    996      Other Drug
+    997      Tested for Drugs, Results Unknown
+    998      Tested for Drugs, Drugs Found, Type Unknown/Positive
+    999      Unknown If Tested
+    Code 095 sits between 001 and 100 and belongs to no category range.
+    In the rows inspected, 996 often follows a person's last identified drug
+    code, with 0 filling the remaining slot (for example 600, 996, 0), so it
+    can be a filler and not a separate drug. This project assigns a person
+    with an identified Narcotic, Depressant, Stimulant or Cannabinoid result
+    to that category even when 996 is also present, and uses "Other drug"
+    only when no such category is found.
+
+
+CODES TREATED AS MISSING IN THIS PROJECT
+========================================
+Numeric columns (code -> missing):
+   county                       0, 997, 998, 999
+   land_use                     6, 8, 9
+   functional_system            96, 98, 99
+   first_harmful_event          99
+   manner_of_collision          98, 99
+   injury_severity              5, 6, 9
+   restraint_system_helmet_use  0, 29, 98, 99
+   air_bag_deployed             0, 98, 99
+   ejection                     7, 8, 9
+   age                          998 and above
+   alcohol_test_status3 (bac)   995-999
+
+Text columns (label -> missing):
+   sex                                  Not Reported, Unknown
+   school_bus_related                   Not Reported
+   police_reported_alcohol_involvement  Not Reported, Unknown (Police Reported)
+   police_reported_drug_involvement     Not Reported, Unknown (Police Reported)
+   alcohol_test_status1                 Not Reported, Unknown if Tested
+   drug_test_status                     Not Reported, Unknown if Tested
+
+Drug slots: 095, 997 and 999 give an unknown result and 000 marks an empty
+slot; none of these counts as a drug.

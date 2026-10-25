@@ -1,0 +1,36 @@
+-- FARS 2015 person-level data: the 30-column pull
+-- One row per person involved in a fatal crash. Raw columns only, no derived fields.
+-- Table path: swap in your own project and dataset if your copy is not the public one.
+
+SELECT
+  consecutive_number,
+  person_number,
+  state_number,
+  county,
+  timestamp_of_crash,
+  land_use,
+  functional_system,
+  number_of_motor_vehicles_in_transport_mvit,
+  first_harmful_event,
+  manner_of_collision,
+  school_bus_related,
+  vehicle_make,
+  body_type,
+  rollover,
+  fire_occurrence,
+  age,
+  sex,
+  person_type,
+  injury_severity,
+  restraint_system_helmet_use,
+  air_bag_deployed,
+  ejection,
+  police_reported_alcohol_involvement,
+  alcohol_test_status1,
+  alcohol_test_status3,
+  police_reported_drug_involvement,
+  drug_test_status,
+  drug_test_type4,
+  drug_test_type5,
+  drug_test_type6
+FROM `bigquery-public-data.nhtsa_traffic_fatalities.person_2015`;
